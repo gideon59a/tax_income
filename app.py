@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+import json
 
 from tax_income.tax_years import calc_net
 from shared_utils.my_utils.glogger import LoggerManager
@@ -9,11 +10,20 @@ logger.debug(f"Start logging.")
 
 app = Flask(__name__)
 
+default_year = 2025
+default_income =200000
+default_at_pension_age = 'True'
+index_html_params = {
+    "default2": default_year,
+    "default4": default_income,
+    "at_pension_age": default_at_pension_age
+}
+
 
 @app.route('/')
 def index():
     # Entering the main url activates this html page
-    return render_template("index.html")
+    return render_template("index.html", **index_html_params)
 
 
 @app.route('/process', methods=['POST'])
@@ -24,13 +34,14 @@ def process():
     year = data['val2']
     at_pension_age = data['at_pension_age']
     income = data['val4']
-    # print(f"TTTTT {year}  {type(year)}  ;   {income}  {type(income)}")
+
+    # convert at_pension_age string to boolean
+    at_pension_age_bool = json.loads(at_pension_age.lower())
     try:
         net_income, tax_yearly, marginal_tax_rate = (
-            calc_net(year=int(year), income=int(income), log=logger, pension=at_pension_age))
+            calc_net(year=int(year), income=int(income), log=logger, pension=at_pension_age_bool))
     except Exception as e:
         print(f"*** FAILED **** error: {e}")
-
     # Create the json to return to the html page
     # ------------------------------------------
     row_inputs = [
@@ -58,4 +69,4 @@ def process():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5003)
+    app.run(debug=True, port=5000)

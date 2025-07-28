@@ -70,7 +70,7 @@ def test_calc_year_tax(log):
 
 
 if __name__ == "__main__":
-    from utils.glogger import LoggerManager
+    from shared_utils.my_utils.glogger import LoggerManager
     glogger = LoggerManager(filename='test.log')
     logger = glogger.get_logger()
     logger.debug(f"Start logging.")
