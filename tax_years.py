@@ -3,14 +3,7 @@ import logging
 
 from tax_general_calc import calc_year_tax
 from shared_utils.my_utils.excel_rw import read_excel_file
-#from utils.excel_rw import read_excel_file
 from shared_utils.my_utils.glogger import LoggerManager
-#from utils.glogger import LoggerManager
-
-glogger = LoggerManager(filename='tax.log')
-logger = glogger.get_logger()
-logger.debug(f"Start logging.")
-
 
 def calc_net(year, income, log, pension=False):
     """
@@ -25,12 +18,14 @@ def calc_net(year, income, log, pension=False):
         tax_yearly: Yearly tax deduced from the net income
         marginal_tax_rate: Of that tax, in percentage
     """
+
     pension_ptor_per_month = 5375
     if pension:
         yearly_income_for_tax = income - pension_ptor_per_month * 12
+        log.info(f"Reducing income amount for tax by {pension_ptor_per_month * 12} ILS because it is a pension year")
     else:
         yearly_income_for_tax = income
-    tax_yearly, marginal_tax_rate = calc_year_tax(year, yearly_income_for_tax, log=logger, calc_nekudot_zikui=True)
+    tax_yearly, marginal_tax_rate = calc_year_tax(year, yearly_income_for_tax, log=log, calc_nekudot_zikui=True)
     log.info(f"Tax per year {year} for yearly income {income} = {tax_yearly}"
              f" with marginal_tax_rate = {marginal_tax_rate}%")
     net_income = income - tax_yearly
@@ -50,14 +45,22 @@ def read_income_and_tax(year, income):
     print(dict_read)
 
 
-yearly_net_income_pension, tax, tax_margin = calc_net(2025, income=23000*12, log=logger, pension=True)
-logger.info(f"yearly_net_income if pension: {round(yearly_net_income_pension)}. "
-            f"PER MONTH={round(yearly_net_income_pension/12)}. \n"
-            f"Yearly tax={tax} with {tax_margin}% margin\n")
+if __name__ == "__main__":
+    glogger = LoggerManager(filename='tax.log')
+    logger = glogger.get_logger()
+    logger.debug(f"Start logging.")
 
-yearly_net_income_regular, tax, tax_margin = calc_net(2025, income=23000*12, log=logger, pension=False)
-logger.info(f"yearly_net_income for regular: {round(yearly_net_income_regular)}. "
-            f"PER MONTH={round(yearly_net_income_pension/12)}. \n"
-            f"Yearly tax={tax} with {tax_margin}% margin\n")
-diff_between_pension_and_regualr = round(yearly_net_income_pension - yearly_net_income_regular)
-logger.info(f"Diff = {diff_between_pension_and_regualr}")
+    logger.info(f"\n ****** Calculate for a pension year ***")
+    yearly_net_income_pension, tax, tax_margin = calc_net(2025, income=23000*12, log=logger, pension=True)
+    logger.info(f"yearly_net_income if pension: {round(yearly_net_income_pension)}. "
+                f"PER MONTH={round(yearly_net_income_pension/12)}. \n"
+                f"Yearly tax={tax} with {tax_margin}% margin\n")
+
+    logger.info(f"\n ****** Calculate for a REGULAR (non pension) year ***")
+    yearly_net_income_regular, tax, tax_margin = calc_net(2025, income=23000*12, log=logger, pension=False)
+    logger.info(f"yearly_net_income for regular: {round(yearly_net_income_regular)}. "
+                f"PER MONTH={round(yearly_net_income_regular/12)}. \n"
+                f"Yearly tax={tax} with {tax_margin}% margin\n")
+
+    diff_between_pension_and_regualr = round(yearly_net_income_pension - yearly_net_income_regular)
+    logger.info(f"Diff between a pension and a non-pension tax: {diff_between_pension_and_regualr} ILS")

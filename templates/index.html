@@ -10,16 +10,16 @@
 
     <h2>Income Tax Calculation</h2>
 
-    <label>Year: <input type="number" id="val2" value="2025"></label>
+    <label>Year: <input type="number" id="val2" value="{{ default2 }}"></label>
     <br><br>
 
-    <label>Yearly income (integer): <input type="number" id="val4" value=200000></label>
+    <label>Yearly income (integer): <input type="number" id="val4" value="{{ default4 }}"></label>
     <br><br>
 
     <label>A pension age (boolean):
         <select id="at_pension_age">
-            <option value="True">True</option>
-            <option value="False">False</option>
+            <option value="True" {% if pension_age=="True" %} selected{% endif %}>True</option>
+            <option value="False" {% if pension_age=="False" %}selected{% endif %}>False</option>
         </select>
     </label>
     <br><br>
