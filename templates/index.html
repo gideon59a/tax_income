@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Parameter Input</title>
+</head>
+<body>
+    // The body includes the page as presented when  entering the main url.
+    // The body contains just the user inputs
+
+    <h2>Income Tax Calculation</h2>
+
+    <label>Year: <input type="number" id="val2" value="2025"></label>
+    <br><br>
+
+    <label>Yearly income (integer): <input type="number" id="val4" value=200000></label>
+    <br><br>
+
+    <label>A pension age (boolean):
+        <select id="at_pension_age">
+            <option value="True">True</option>
+            <option value="False">False</option>
+        </select>
+    </label>
+    <br><br>
+
+    <button onclick="sendData()">Submit (calculate)</button>
+    <br><br>
+    <div id="output"></div>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+
+</html>
