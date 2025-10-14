@@ -32,7 +32,7 @@ async function sendData() {
             alert("Network error. Please check your connection.");
             }
 
-        let table1 = "<h3>Income info:</h3>";
+        let table1 = "<h3>Income info (user inputs):</h3>";
         table1 += "<table border='1'><tr>";
         for (let col of result.main_table.columns) {
             table1 += "<th>" + col + "</th>";

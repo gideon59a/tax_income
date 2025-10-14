@@ -46,14 +46,14 @@ def process():
     # ------------------------------------------
     row_inputs = [
         ["Year", f"{data['val2']}"],
-        ["Income", int(data['val4']) if data['val4'].isdigit() else "Invalid int"],
+        ["Income ils", int(data['val4']) if data['val4'].isdigit() else "Invalid int"],
         ["Pension year?", data['at_pension_age']]
     ]
 
     row_outputs = [
-        ["NET INCOME", net_income],
-        ["TAX", tax_yearly],
-        ["TAX margin %", marginal_tax_rate]
+        ["Net income ils", round(net_income)],
+        ["Tax ils", round(tax_yearly)],
+        ["Tax margin %", marginal_tax_rate]
     ]
 
     return jsonify({
@@ -62,11 +62,11 @@ def process():
             "rows": row_inputs
         },
         "net_income_table": {
-            "columns": ["Parameter2", "Value2"],
+            "columns": ["Parameter", "Value"],
             "rows": row_outputs
         }
     })
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5011)
