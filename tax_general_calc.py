@@ -12,7 +12,7 @@ def calc_year_tax(year, year_income: int, log, calc_nekudot_zikui=True):
         marginal_tax_rate: The max tax step paid, in percentage
     """
 
-    print(f"Calculate the tax amount per the yearly income")
+    log.info(f"Calculate the tax amount per the yearly income")
 
     year_str = str(year)
     tax_steps_year = tax_steps[year_str]
@@ -44,6 +44,7 @@ def calc_year_tax(year, year_income: int, log, calc_nekudot_zikui=True):
         exit(1)
 
     if calc_nekudot_zikui:
+        log.info(f"Deducing {value_nekudot_zikui_per_month * 12} ILS due to nekudot zikui")
         tax -= value_nekudot_zikui_per_month * 12
         tax = max(tax, 0)
 
