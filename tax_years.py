@@ -4,8 +4,9 @@ import logging
 from tax_general_calc import calc_year_tax
 from shared_utils.my_utils.excel_rw import read_excel_file
 from shared_utils.my_utils.glogger import LoggerManager
+from info.tax_info import pension_ptor_per_month_dict
 
-def calc_net(year, income, log, pension=False):
+def calc_net(year_str, income, log, pension=False):
     """
     Calculates the tax and net income.
     Args:
@@ -19,21 +20,27 @@ def calc_net(year, income, log, pension=False):
         marginal_tax_rate: Of that tax, in percentage
     """
 
-    pension_ptor_per_month = 5375
     if pension:
-        yearly_income_for_tax = income - pension_ptor_per_month * 12
-        log.info(f"Reducing income amount for tax by {pension_ptor_per_month * 12} ILS because it is a pension year")
+        pension_ptor_per_month = pension_ptor_per_month_dict[year_str]
+        log.info(f"Pension PTOR per month: {pension_ptor_per_month} ILS")
+        if year_str == "2026":  # Assuming I get just 3 months pension that year
+            num_of_pension_month = 3
+        else:
+            num_of_pension_month = 12
+        yearly_income_for_tax = income - pension_ptor_per_month * num_of_pension_month
+        log.info(f"Reducing income amount for tax by {pension_ptor_per_month * num_of_pension_month} ILS because it is a pension year")
     else:
         yearly_income_for_tax = income
-    tax_yearly, marginal_tax_rate = calc_year_tax(year, yearly_income_for_tax, log=log, calc_nekudot_zikui=True)
-    log.info(f"Tax per year {year} for yearly income {income} = {tax_yearly}"
+    log.info(f"Calculating tax for yearly_income_for_tax of {yearly_income_for_tax}")
+    tax_yearly, marginal_tax_rate = calc_year_tax(year_str, yearly_income_for_tax, log=log, calc_nekudot_zikui=True)
+    log.info(f"Tax per year {year_str} for yearly income {income} = {tax_yearly}"
              f" with marginal_tax_rate = {marginal_tax_rate}%")
     net_income = income - tax_yearly
     log.info(f"net income = {round(net_income)}")
-    return net_income, tax_yearly, marginal_tax_rate
+    return yearly_income_for_tax, net_income, tax_yearly, marginal_tax_rate
 
 
-def read_income_and_tax(year, income):
+def not_used__read_income_and_tax(year, income):
 
     run_py_dir = os.path.dirname(os.path.abspath(__file__))  # Get the absolute path of the directory where run.py is located
     info_dir_path = os.path.join(run_py_dir, 'info')  # Construct the path to the info_dir subdirectory

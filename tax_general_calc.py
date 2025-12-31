@@ -1,7 +1,7 @@
-from tax_income.info.tax_info import tax_steps, value_nekudot_zikui_per_month
+from tax_income.info.tax_info import tax_steps, value_nekudot_zikui_per_month_dict
 
 
-def calc_year_tax(year, year_income: int, log, calc_nekudot_zikui=True):
+def calc_year_tax(year_str, year_income: int, log, calc_nekudot_zikui=True):
     """
     Calculates the yearly tax
     Args:
@@ -12,9 +12,8 @@ def calc_year_tax(year, year_income: int, log, calc_nekudot_zikui=True):
         marginal_tax_rate: The max tax step paid, in percentage
     """
 
-    log.info(f"Calculate the tax amount per the yearly income")
+    log.info(f"Calculate the tax amount for year {year_str} per the yearly income for tax {year_income}")
 
-    year_str = str(year)
     tax_steps_year = tax_steps[year_str]
 
     tax = 0
@@ -25,15 +24,18 @@ def calc_year_tax(year, year_income: int, log, calc_nekudot_zikui=True):
         key = next(iter(step_info))  # The step has a single ket-value pair, so it gets the 1st and only key
         params = step_info[key]
         log.debug(f"key {key}, params {params}")
-        log.debug(f"income_to_calc_tax: {income_left_for_calc_tax}  previuos_max_annual_ils : {previuos_max_annual_ils}"
+        log.debug(f"income left for tax calc: {income_left_for_calc_tax} previuos_max_annual_ils : {previuos_max_annual_ils}"
                   f"----------------------------------------------------------------------")
         this_step_max_amount = params["max_annual_ils"] - previuos_max_annual_ils
         amount_to_tax_in_this_step = min(income_left_for_calc_tax, this_step_max_amount)
         this_step_tax = amount_to_tax_in_this_step * params["tax_percentage"] / 100
         tax += this_step_tax
+        log.info(f"Tax calculated for step {step_info[key]} is {this_step_tax}. Accumulated tax: {tax}")
 
         previuos_max_annual_ils = params["max_annual_ils"]
         income_left_for_calc_tax -= amount_to_tax_in_this_step
+        log.info(f"Income left for tax calculation: {income_left_for_calc_tax}")
+
         if income_left_for_calc_tax == 0:
             marginal_tax_rate = params["tax_percentage"]
             log.debug(f"Tax calc ends. Yearly tax (w/o nekudot zikui) = {tax}, "
@@ -44,6 +46,7 @@ def calc_year_tax(year, year_income: int, log, calc_nekudot_zikui=True):
         exit(1)
 
     if calc_nekudot_zikui:
+        value_nekudot_zikui_per_month = value_nekudot_zikui_per_month_dict[year_str]
         log.info(f"Deducing {value_nekudot_zikui_per_month * 12} ILS due to nekudot zikui")
         tax -= value_nekudot_zikui_per_month * 12
         tax = max(tax, 0)

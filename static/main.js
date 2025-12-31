@@ -50,7 +50,7 @@ async function sendData() {
         // Render NET INCOME table
         let netTable = "";
         if (result.net_income_table.rows.length > 0) {
-            netTable += "<h3>Net income and tax:</h3>";
+            netTable += "<h3>Income and tax:</h3>";
             netTable += "<table border='1'><tr>";
             for (let col of result.net_income_table.columns) {
                 netTable += "<th>" + col + "</th>";
