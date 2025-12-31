@@ -10,8 +10,8 @@ logger.debug(f"Start logging.")
 
 app = Flask(__name__)
 
-default_year = 2025
-default_income =200000
+default_year = 2026
+default_income =280000
 default_at_pension_age = 'True'
 index_html_params = {
     "default2": default_year,
@@ -38,10 +38,13 @@ def process():
     # convert at_pension_age string to boolean
     at_pension_age_bool = json.loads(at_pension_age.lower())
     try:
-        net_income, tax_yearly, marginal_tax_rate = (
-            calc_net(year=int(year), income=int(income), log=logger, pension=at_pension_age_bool))
+        logger.info(f"Staring. year: {type(year)} {year}, income: {income}, at_pension_age: {at_pension_age_bool} ")
+        yearly_income_for_tax, net_income, tax_yearly, marginal_tax_rate = (
+            calc_net(year_str=year, income=int(income), log=logger, pension=at_pension_age_bool))
     except Exception as e:
+        logger.error(f"Exception: {e}")
         print(f"*** FAILED **** error: {e}")
+
     # Create the json to return to the html page
     # ------------------------------------------
     row_inputs = [
@@ -51,8 +54,10 @@ def process():
     ]
 
     row_outputs = [
-        ["Net income ils", round(net_income)],
-        ["Tax ils", round(tax_yearly)],
+        ["Yearly income for tax", round(yearly_income_for_tax)],
+        ["Net income ils, yearly", round(net_income)],
+        ["Net income ils, monthly", round(net_income/12)],
+        ["Tax ils, yearly", round(tax_yearly)],
         ["Tax margin %", marginal_tax_rate]
     ]
 
@@ -69,4 +74,4 @@ def process():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5011)
+    app.run(host="127.0.0.1", port=5011, debug=True)
